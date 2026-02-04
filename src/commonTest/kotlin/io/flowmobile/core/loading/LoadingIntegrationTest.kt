@@ -18,7 +18,7 @@ class LoadingIntegrationTest {
     // ==================== E2E: Fluxo Simples ====================
     
     @Test
-    fun testE2E_SimpleFlow_LoadAndExecute() {
+    fun testE2E_SimpleFlow_LoadAndExecute() = kotlinx.coroutines.test.runTest {
         // 1. JSON de entrada
         val json = """
         {
@@ -58,17 +58,14 @@ class LoadingIntegrationTest {
         // 4. Executar fluxo
         val executor = FlowExecutor(HostServiceRegistry())
         
-        // Usar runBlocking para testes (em Kotlin Multiplatform, usar runTest)
-        val executionResult = runBlockingTest {
-            executor.execute(flow)
-        }
+        val executionResult = executor.execute(flow)
         
         // 5. Verificar resultado
         assertTrue(executionResult.isSuccess(), "Execução deve ser bem-sucedida")
     }
     
     @Test
-    fun testE2E_FlowWithAction_LoadAndExecute() {
+    fun testE2E_FlowWithAction_LoadAndExecute() = kotlinx.coroutines.test.runTest {
         // 1. JSON com ActionComponent
         val json = """
         {
@@ -130,16 +127,14 @@ class LoadingIntegrationTest {
         
         // 4. Executar
         val executor = FlowExecutor(registry)
-        val executionResult = runBlockingTest {
-            executor.execute(flow)
-        }
+        val executionResult = executor.execute(flow)
         
         // 5. Verificar
         assertTrue(executionResult.isSuccess())
     }
     
     @Test
-    fun testE2E_FlowWithDecision_TrueBranch() {
+    fun testE2E_FlowWithDecision_TrueBranch() = kotlinx.coroutines.test.runTest {
         val json = """
         {
             "schemaVersion": "1.0.0",
@@ -194,9 +189,7 @@ class LoadingIntegrationTest {
             initialComponentId = flow.getStartComponent().id
         ).withVariable("isActive", VariableValue.BooleanValue(true))
         
-        val executionResult = runBlockingTest {
-            executor.execute(flow, context)
-        }
+        val executionResult = executor.execute(flow, context)
         
         assertTrue(executionResult.isSuccess())
         
@@ -206,7 +199,7 @@ class LoadingIntegrationTest {
     }
     
     @Test
-    fun testE2E_FlowWithDecision_FalseBranch() {
+    fun testE2E_FlowWithDecision_FalseBranch() = kotlinx.coroutines.test.runTest {
         val json = """
         {
             "schemaVersion": "1.0.0",
@@ -260,9 +253,7 @@ class LoadingIntegrationTest {
             initialComponentId = flow.getStartComponent().id
         ).withVariable("isActive", VariableValue.BooleanValue(false))
         
-        val executionResult = runBlockingTest {
-            executor.execute(flow, context)
-        }
+        val executionResult = executor.execute(flow, context)
         
         assertTrue(executionResult.isSuccess())
     }
@@ -325,7 +316,7 @@ class LoadingIntegrationTest {
     // ==================== E2E: Fluxo Complexo ====================
     
     @Test
-    fun testE2E_ComplexFlow_LoadValidateExecute() {
+    fun testE2E_ComplexFlow_LoadValidateExecute() = kotlinx.coroutines.test.runTest {
         val json = """
         {
             "schemaVersion": "1.0.0",
@@ -434,9 +425,7 @@ class LoadingIntegrationTest {
             initialComponentId = flow.getStartComponent().id
         ).withVariable("dataValid", VariableValue.BooleanValue(true))
         
-        val executionResult = runBlockingTest {
-            executor.execute(flow, context)
-        }
+        val executionResult = executor.execute(flow, context)
         
         // 6. Verificar resultado
         assertTrue(executionResult.isSuccess())
@@ -460,22 +449,4 @@ class LoadingIntegrationTest {
         }
     }
     
-    // Helper para executar suspend functions em testes
-    private fun <T> runBlockingTest(block: suspend () -> T): T {
-        var result: T? = null
-        var exception: Throwable? = null
-        
-        kotlinx.coroutines.test.runTest {
-            try {
-                result = block()
-            } catch (e: Throwable) {
-                exception = e
-            }
-        }
-        
-        exception?.let { throw it }
-        
-        @Suppress("UNCHECKED_CAST")
-        return result as T
-    }
 }
