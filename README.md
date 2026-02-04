@@ -386,6 +386,90 @@ java -version
 ./gradlew test --continuous
 ```
 
+## 🌐 Uso no Web (JS/TS) via npm
+
+O pacote JS é publicado como npm package e pode ser consumido em apps Vite/React.
+
+### Instalação
+
+```bash
+npm install @<owner>/flow-engine-core
+```
+
+### Exemplo (JS/TS)
+
+```ts
+import { FlowEngineJs, JsHostServiceRegistry } from "@<owner>/flow-engine-core";
+
+const engine = new FlowEngineJs();
+const services = new JsHostServiceRegistry();
+
+services.register("logger", (method, paramsJson) => {
+    const params = JSON.parse(paramsJson);
+    console.log("logger:", method, params);
+    return JSON.stringify("ok");
+});
+
+const flowJson = JSON.stringify({
+    schemaVersion: "1.0.0",
+    flow: {
+        id: "flow-1",
+        name: "Hello Flow",
+        version: "1.0.0",
+        components: [
+            { id: "start", type: "START", name: "Start" },
+            {
+                id: "action",
+                type: "ACTION",
+                name: "Log",
+                properties: { service: "logger", method: "log" }
+            },
+            { id: "end", type: "END", name: "End" }
+        ],
+        connections: [
+            {
+                id: "c1",
+                source: { componentId: "start", portId: "out" },
+                target: { componentId: "action", portId: "in" }
+            },
+            {
+                id: "c2",
+                source: { componentId: "action", portId: "success" },
+                target: { componentId: "end", portId: "in" }
+            }
+        ]
+    }
+});
+
+const validation = engine.validate(flowJson);
+if (!validation.isValid) {
+    console.error(validation.errors);
+} else {
+    const resultJson = await engine.execute(flowJson, services);
+    const result = JSON.parse(resultJson);
+    console.log("result:", result);
+}
+```
+
+### Sobre o JSON de serviços
+
+- O `paramsJson` recebido pelo handler é um objeto JSON com valores simples
+    (string, number, boolean, array, objeto, null).
+- O retorno do handler deve ser um JSON string representando um valor simples
+    (ex: `"ok"`, `123`, `{ "foo": true }`) ou `null`.
+
+## 📦 Publicação npm (JS)
+
+```bash
+# Gerar pacote JS (inclui .d.ts)
+./gradlew jsProductionLibraryDistribution
+
+# Publicar no npm (precisa de NPM_TOKEN)
+./gradlew publishJsToNpm
+```
+
+> Para publicar em outro escopo, defina `NPM_SCOPE` ou use `-PnpmScope=seu-scope`.
+
 ## 💻 Exemplo de Uso
 
 ### Criando um Fluxo Simples

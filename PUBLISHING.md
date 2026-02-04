@@ -1,5 +1,22 @@
 # Publicação da Biblioteca
 
+## Publicar no npm (JavaScript)
+
+Pré-requisitos:
+- Node.js 18+ instalado
+- Token npm com permissão de publish (defina `NPM_TOKEN`)
+- Opcional: `NPM_SCOPE` ou `-PnpmScope=seu-scope`
+
+```bash
+# Gera o pacote JS (inclui typings .d.ts)
+./gradlew jsProductionLibraryDistribution
+
+# Publica no npm (usa o pacote em build/js/packages/flow-engine-core)
+./gradlew publishJsToNpm
+```
+
+> O nome do pacote é gerado como `@<scope>/flow-engine-core`.
+
 ## Publicar no Maven Local
 
 Para publicar a biblioteca no repositório Maven Local (`~/.m2/repository`):

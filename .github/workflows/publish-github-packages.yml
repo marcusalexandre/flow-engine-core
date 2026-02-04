@@ -26,6 +26,12 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
       - name: Run tests
         run: ./gradlew jvmTest jsNodeTest --no-daemon
 
@@ -33,4 +39,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
+          NPM_SCOPE: ${{ github.repository_owner }}
         run: ./gradlew publishAllPublicationsToGitHubPackagesRepository --no-daemon
+
+      - name: Publish npm package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_SCOPE: ${{ github.repository_owner }}
+        run: ./gradlew publishJsToNpm --no-daemon

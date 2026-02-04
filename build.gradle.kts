@@ -1,4 +1,5 @@
 import java.util.Properties
+import org.gradle.api.tasks.Exec
 
 plugins {
     kotlin("multiplatform") version "1.9.22"
@@ -32,6 +33,11 @@ if (enableAndroid) {
 group = "io.flowmobile"
 version = "0.1.1"
 
+val npmScope = (project.findProperty("npmScope") as String?)
+    ?: System.getenv("NPM_SCOPE")
+    ?: "marcusalexandre"
+val npmPackageName = "@${npmScope}/${project.name}"
+
 kotlin {
     // JVM Target
     jvm {
@@ -43,6 +49,9 @@ kotlin {
     
     // JS Target
     js(IR) {
+        moduleName = project.name
+        binaries.library()
+        generateTypeScriptDefinitions()
         browser {
             commonWebpackConfig {
                 cssSupport {
@@ -51,6 +60,13 @@ kotlin {
             }
         }
         nodejs()
+
+        compilations["main"].packageJson {
+            name = npmPackageName
+            version = project.version.toString()
+            customField("types", "kotlin/${project.name}.d.ts")
+            customField("module", "kotlin/${project.name}.js")
+        }
     }
     
     // Android Target
@@ -145,4 +161,14 @@ publishing {
             }
         }
     }
+}
+
+val jsPackageDir = layout.buildDirectory.dir("js/packages/${project.name}")
+
+tasks.register<Exec>("publishJsToNpm") {
+    dependsOn("jsProductionLibraryDistribution")
+    doFirst {
+        workingDir = jsPackageDir.get().asFile
+    }
+    commandLine("npm", "publish", "--access", "public")
 }
