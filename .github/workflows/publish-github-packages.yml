@@ -26,6 +26,9 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
+      - name: Run tests
+        run: ./gradlew jvmTest jsNodeTest --no-daemon
+
       - name: Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
