@@ -164,11 +164,18 @@ publishing {
 }
 
 val jsPackageDir = layout.buildDirectory.dir("js/packages/${project.name}")
+val npmRegistry = (project.findProperty("npmRegistry") as String?)
+    ?: System.getenv("NPM_REGISTRY")
+    ?: "https://registry.npmjs.org"
 
 tasks.register<Exec>("publishJsToNpm") {
-    dependsOn("jsProductionLibraryDistribution")
+    dependsOn("jsBrowserProductionLibraryDistribution")
     doFirst {
         workingDir = jsPackageDir.get().asFile
     }
-    commandLine("npm", "publish", "--access", "public")
+    if (npmRegistry.contains("npmjs.org")) {
+        commandLine("npm", "publish", "--access", "public", "--registry", npmRegistry)
+    } else {
+        commandLine("npm", "publish", "--registry", npmRegistry)
+    }
 }
