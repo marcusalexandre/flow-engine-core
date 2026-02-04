@@ -40,10 +40,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
           NPM_SCOPE: ${{ github.repository_owner }}
-        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository --no-daemon
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository --no-daemon -PversionOverride=0.1.${{ github.run_number }}
 
       - name: Publish npm package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_SCOPE: ${{ github.repository_owner }}
-        run: ./gradlew publishJsToNpm --no-daemon
+        run: ./gradlew publishJsToNpm --no-daemon -PversionOverride=0.1.${{ github.run_number }}

@@ -31,7 +31,7 @@ if (enableAndroid) {
 }
 
 group = "io.flowmobile"
-version = "0.1.1"
+version = (project.findProperty("versionOverride") as String?) ?: "0.1.1"
 
 val npmScope = (project.findProperty("npmScope") as String?)
     ?: System.getenv("NPM_SCOPE")
