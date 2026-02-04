@@ -26,6 +26,7 @@ bin/
 
 # Kotlin
 *.kotlin_module
+kotlin-js-store/
 
 # Local configuration
 local.properties
