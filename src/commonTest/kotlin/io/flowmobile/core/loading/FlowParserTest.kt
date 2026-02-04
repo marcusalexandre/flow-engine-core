@@ -187,9 +187,9 @@ class FlowParserTest {
         val decisionComponent = document.flow.components.find { it.id == "decision-1" }
         assertNotNull(decisionComponent)
         
-        val conditionProp = decisionComponent.properties["condition"]
-        assertTrue(conditionProp is PropertyDefinition.Expression)
-        assertEquals("\${user.isActive}", (conditionProp as PropertyDefinition.Expression).expression)
+        val conditionProp = decisionComponent.properties["condition"] as? PropertyDefinition.Expression
+        assertNotNull(conditionProp)
+        assertEquals("\${user.isActive}", conditionProp.expression)
     }
     
     @Test

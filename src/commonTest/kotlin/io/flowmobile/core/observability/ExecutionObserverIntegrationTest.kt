@@ -24,6 +24,11 @@ class ExecutionObserverIntegrationTest {
             .addObserver(metricsObserver)
             .addObserver(tracingObserver)
         
+        val flow = createSimpleFlow()
+        val context = ExecutionContext.create(flow.id, flow.getStartComponent().id)
+        val timestamp = Clock.System.now()
+        composite.onExecutionStarted(flow, context, timestamp)
+        
         // Composite foi criado corretamente
         assertTrue(true)
     }

@@ -36,10 +36,9 @@ class ExecutionContextTest {
         
         // New context has variable
         assertEquals(1, newContext.variables.size)
-        val userIdValue = newContext.getVariable("userId")
+        val userIdValue = newContext.getVariable("userId") as? VariableValue.StringValue
         assertNotNull(userIdValue)
-        assertTrue(userIdValue is VariableValue.StringValue)
-        assertEquals("123", (userIdValue as VariableValue.StringValue).value)
+        assertEquals("123", userIdValue.value)
     }
     
     @Test

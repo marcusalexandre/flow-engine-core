@@ -265,9 +265,10 @@ class MockNetworkServiceTest {
     fun testDownload() = runTest {
         val result = network.download("https://example.com/file.txt")
         
-        assertTrue(result is DownloadResult.Success)
-        val success = result as DownloadResult.Success
-        assertTrue(success.data.isNotEmpty())
+        when (result) {
+            is DownloadResult.Success -> assertTrue(result.data.isNotEmpty())
+            else -> fail("Expected download success")
+        }
     }
     
     @Test
@@ -318,8 +319,10 @@ class MockNavigationServiceTest {
     fun testNavigate() = runTest {
         val result = navigation.navigate(Destination(route = "details"))
         
-        assertTrue(result is NavigationResult.Success)
-        assertEquals("details", (result as NavigationResult.Success).destination.route)
+        when (result) {
+            is NavigationResult.Success -> assertEquals("details", result.destination.route)
+            else -> fail("Expected navigation success")
+        }
     }
     
     @Test
@@ -328,16 +331,20 @@ class MockNavigationServiceTest {
         
         val result = navigation.navigateBack()
         
-        assertTrue(result is NavigationResult.Success)
-        assertEquals("home", (result as NavigationResult.Success).destination.route)
+        when (result) {
+            is NavigationResult.Success -> assertEquals("home", result.destination.route)
+            else -> fail("Expected navigation success")
+        }
     }
     
     @Test
     fun testNavigateBackNoStack() = runTest {
         val result = navigation.navigateBack()
         
-        assertTrue(result is NavigationResult.Failure)
-        assertEquals(NavigationFailureReason.NO_BACK_STACK, (result as NavigationResult.Failure).reason)
+        when (result) {
+            is NavigationResult.Failure -> assertEquals(NavigationFailureReason.NO_BACK_STACK, result.reason)
+            else -> fail("Expected navigation failure")
+        }
     }
     
     @Test

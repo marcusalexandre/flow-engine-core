@@ -3,6 +3,7 @@ package io.flowmobile.core.security.validation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 /**
  * Testes para o módulo de validação de segurança.
@@ -12,8 +13,10 @@ class ExpressionSanitizerTest {
     @Test
     fun testSanitizeValidExpression() {
         val result = ExpressionSanitizer.sanitize("user.name")
-        assertTrue(result is SanitizeResult.Valid)
-        assertEquals("user.name", (result as SanitizeResult.Valid).expression)
+        when (result) {
+            is SanitizeResult.Valid -> assertEquals("user.name", result.expression)
+            else -> fail("Expected Valid result")
+        }
     }
 
     @Test
